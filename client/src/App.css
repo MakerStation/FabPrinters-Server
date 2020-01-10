@@ -1,0 +1,70 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+.grassetto {
+  font-weight: bold;
+  font-size: 1.5rem !important;
+}
+.printTab {
+  /* width: 350px; */
+}
+.riga1 {
+  /* width: 350px !important; */
+}
+
+.commandLog {
+  height: 255px!important;
+  font-size: 0.81rem;
+}
+
+.fontMonospace {
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+.progressBar {
+  height: 20px!important;
+  font-size: 15px;
+}
+
+.emergencyStopIcon {
+  width: 60px;
+}
+.emergencyStopBtn {
+  padding: 0px 0px 0px 0px !important;
+  background: none !important;
+  border: none !important;
+}
+.emergencyStopBtn:hover, ..emergencyStopBtn:focus {
+  padding: 0px 0px 0px 0px !important;
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+}
+.navItemPrinters {
+  border-color: lightgrey !important;
+}
+.navItemPrintersActive {
+  border-bottom: none !important;
+  border-color: darkgray !important;
+  border-width: 2.5px !important
+}
