@@ -68,6 +68,7 @@ class App extends React.Component {
     let id = e.currentTarget.dataset.div_id
     console.log(id)
     this.setState({currentPrinter: id})
+    socket.emit("switch print tab", id)
     // this.printersTabs(4)
   }
 

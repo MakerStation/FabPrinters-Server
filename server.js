@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const socketIo = require('socket.io');
 const db = require('quick.db');
+const fs = require('fs');
 
 //===================SERVER INIT==============================
 const port = process.env.PORT || 3001
@@ -19,6 +20,8 @@ const server = http.createServer(app)
 //===================ROUTES===================================
 const index = require("./routes/index")
 app.use(index)
+const getcommandlog = require("./routes/getCommandLog")
+app.use(getcommandlog)
 
 //===================SOCKET INIT==============================
 const io = socketIo(server)
@@ -30,6 +33,8 @@ io.on("connection", socket => {
   socket.on("new command", (id, command, fn) => {
     console.log(id+": "+command)
     fn("ok")
+    let string = "3-"+Date.now()+"-"+command
+    fs.appendFile("./logs/printed/printer"+id+".gcode", string+"\n1-"+Date.now()+"-ok\n", err => console.log(err))
     socket.broadcast.emit("new command from client", id, command)
     io.emit("new command from printer", id, "ok")
   })
@@ -44,6 +49,11 @@ io.on("connection", socket => {
 
   socket.on("new printer", (name, port, baudrate, fn) => {
     newPrinter(name, port, baudrate)
+
+  })
+
+  socket.on("switch print tab", (id) => {
+    socket.emit("switch print tab", id)
 
   })
 

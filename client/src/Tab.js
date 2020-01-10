@@ -10,7 +10,7 @@ import './App.css';
 import Cmd from "./Cmd.js"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faCog, faPlayCircle, faCheckCircle, faExclamationCircle, faPauseCircle, faTimesCircle, faExclamationTriangle, faThermometerHalf } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faCog, faPlayCircle, faCheckCircle, faExclamationCircle, faPauseCircle, faTimesCircle, faExclamationTriangle, faThermometerHalf, faListAlt } from "@fortawesome/free-solid-svg-icons";
 
 var progressBar, connectForm = null
 export default class Tab extends React.Component {
@@ -26,6 +26,8 @@ export default class Tab extends React.Component {
     }
 
     componentDidMount(){
+      console.log(this.commandDiv)
+      console.log(this.commandLog)
       this.props.socket.on("new command from printer", (id, command) => {
         if(this.props.number == id){
           // console.log(command)
@@ -40,6 +42,22 @@ export default class Tab extends React.Component {
           this.commandUpdate()
         }
       })
+      this.props.socket.on("switch print tab", id => {
+        this.commandDiv = []
+        this.commandLog = []
+        this.readCommandsFromFile(id)
+        this.commandUpdate();
+      })
+    }
+
+    async readCommandsFromFile(id){
+      await fetch("http://localhost:3001/commandlog?id="+id).then(response => response.json()).then(async response => {
+        response.dati.forEach(l => {
+          console.log(l)
+          this.commandLog.push(new Cmd(l.command, l.sender, new Date(parseInt(l.date))))
+        })
+      }).catch(e => console.log(e))
+      this.commandUpdate();
     }
 
     ProgBar(){
@@ -58,8 +76,13 @@ export default class Tab extends React.Component {
       playPauseBtn = <Button theme = "success"><FontAwesomeIcon icon={faPlayCircle}/> Print</Button>
       if(this.props.status === "Printing" || this.props.status === "Heating" || this.props.status === "Warning")
       playPauseBtn = <Button theme = "warning"><FontAwesomeIcon icon={faPauseCircle}/> Pause</Button>
+      let logBtn = <Button theme = "secondary" onClick={this.openLog}><FontAwesomeIcon icon={faListAlt}/> Log</Button>
 
-      connectForm = <div>{playPauseBtn} {cancelBtn}</div>
+      connectForm = <div>{playPauseBtn} {cancelBtn} {logBtn}</div>
+    }
+
+    openLog = () => {
+      window.location.href="http://localhost:3001/commandlogcomplete?id="+this.props.number
     }
 
     async send(e){
