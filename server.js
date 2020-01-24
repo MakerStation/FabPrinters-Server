@@ -7,12 +7,14 @@ const http = require('http');
 const socketIo = require('socket.io');
 const db = require('quick.db');
 const fs = require('fs');
+const fileUpload = require('express-fileupload');
 
 //===================SERVER INIT==============================
 const port = process.env.PORT || 3001
 const app = express()
 app.use(logger('dev')) //for log
 app.use(cors())
+app.use(fileUpload())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 const server = http.createServer(app)
@@ -22,6 +24,8 @@ const index = require("./routes/index")
 app.use(index)
 const getcommandlog = require("./routes/getCommandLog")
 app.use(getcommandlog)
+const uploadfile = require("./routes/uploadFile")
+app.use(uploadfile)
 
 //===================SOCKET INIT==============================
 const io = socketIo(server)
@@ -34,17 +38,19 @@ io.on("connection", socket => {
     console.log(id+": "+command)
     fn("ok")
     let string = "3-"+Date.now()+"-"+command
-    fs.appendFile("./logs/printed/printer"+id+".gcode", string+"\n1-"+Date.now()+"-ok\n", err => console.log(err))
+    fs.appendFile("./logs/printed/printer"+id+".log", string+"\n1-"+Date.now()+"-ok\n", err => console.log(err))
     socket.broadcast.emit("new command from client", id, command)
     io.emit("new command from printer", id, "ok")
   })
 
-  socket.on("getStatus", () => {
-    socket.emit("resStatus", )
+  socket.on("get status", () => {
+    socket.emit("res status", )
   })
 
   socket.on("status update", (id, newStatus) => {
-    setPrinterStatus(id, newStatus)
+    // setPrinterStatus(id, newStatus)
+    console.log("Status change: "+id+", "+newStatus)
+    io.emit("set printers status", id, newStatus)
   })
 
   socket.on("new printer", (name, port, baudrate, fn) => {

@@ -6,7 +6,7 @@ class Printers {
   constructor() {
     this.total = 4
 
-    this.status = {1: "Printing", 2: "Paused", 3: "Warning", 4: "Error", 5: "Ready", 6:"Disconnected", 7:"Heating"};
+    this.status = {1: "Printing", 2: "Paused", 3: "Waiting", 4: "Error", 5: "Ready", 6:"Disconnected", 7:"Heating", 8: "Warning"};
   }
 
   getTotal(){

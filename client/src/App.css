@@ -68,3 +68,34 @@
   border-color: darkgray !important;
   border-width: 2.5px !important
 }
+.fileUploadInput {
+  width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.fileUpload {
+  background-color: #007bff;
+  border: none;
+}
+::-webkit-file-upload-button, ::-ms-browse {
+  background-color: #007bff;
+  /* border-color: black;
+  border-width: 1.5px;
+  border-style: solid;
+  border-radius: 3px; */
+  border: none;
+  font-weight: bold;
+  color: white;
+}
+::-webkit-file-upload-button:hover,::-webkit-file-upload-button:active,::-webkit-file-upload-button:focus,
+::-ms-browse:hover, ::-ms-browse:active, ::-ms-browse:focus {
+  background-color: #006fe6;
+  /* border-color: black;
+  border-width: 1.5px;
+  border-style: solid;
+  border-radius: 3px; */
+  color: white;
+}

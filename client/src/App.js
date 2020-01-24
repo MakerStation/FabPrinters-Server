@@ -35,6 +35,7 @@ import socketIOClient from "socket.io-client";
 var socket = null;
 
 var elementPrintersTabs = []
+var S_status = [];
 var Printers = null;
 var CurrentPrinter;
 var PrintersTabs = []
@@ -49,14 +50,20 @@ class App extends React.Component {
     }
     socket = socketIOClient(this.state.endpoint)
     Printers = new ServerRequest.Printers()
+    S_status = Printers.getStatus();
   }
 
   componentDidMount = () => {
       // const socket = socketIOClient(this.state.endpoint)
       this.interval = setInterval(() => this.setState({printTime: new Date().toLocaleTimeString()}), 1000) //(funzione da chiamare, intervallo)
-      socket.on('change color', (col) => {
-          document.body.style.backgroundColor = col
+      // socket.on('change color', (col) => {
+      //     document.body.style.backgroundColor = col
+      // })
+      socket.on("set printers status", (id, newStatus) => {
+        console.log("Status change: "+id+", "+newStatus)
+        S_status[id] = newStatus;
       })
+
   }
 
   componentWillUnmount() {
@@ -74,13 +81,13 @@ class App extends React.Component {
 
   UpdatePrintTab() {
     if(this.state.currentPrinter == 0) return
-    CurrentPrinter = <Tab status={Printers.getStatus()[this.state.currentPrinter]} number={this.state.currentPrinter} progress={Math.round((((new Date().getSeconds()/60)*100) + 0.00001) * 100) / 100} socket={socket}></Tab>
+    CurrentPrinter = <Tab status={S_status[this.state.currentPrinter]} number={this.state.currentPrinter} progress={Math.round((((new Date().getSeconds()/60)*100) + 0.00001) * 100) / 100} socket={socket}></Tab>
   }
 
   printersTabs(n){
     elementPrintersTabs = []
     for(var i=1; i<=n;i++){
-      let temp = Printers.getStatus()[i]
+      let temp = S_status[i]
       let status;
       switch (temp) {
         case "Printing":
@@ -103,6 +110,9 @@ class App extends React.Component {
           break;
         case "Heating":
             status = <span><Badge theme="success"><FontAwesomeIcon icon={faThermometerHalf}/></Badge> Heating</span>
+          break;
+        case "Waiting":
+            status = <span><Badge theme="info"><FontAwesomeIcon icon={faPauseCircle}/></Badge> Waiting</span>
           break;
         default:
             status = <span><Badge theme="light"></Badge> Status not available</span>

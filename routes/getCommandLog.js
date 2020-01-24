@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 router.get("/commandlog", (req, res) => {
   let id = req.query.id
-  fs.readFile("./logs/printed/printer"+id+".gcode",{encoding: 'utf-8'}, (err, data) => {
+  fs.readFile("./logs/printed/printer"+id+".log",{encoding: 'utf-8'}, (err, data) => {
     if(err) {
       console.log(err)
       res.status(404)
@@ -16,7 +16,7 @@ router.get("/commandlog", (req, res) => {
 
 router.get("/commandlogcomplete", (req, res) => {
   let id = req.query.id
-    fs.readFile("./logs/printed/printer"+id+".gcode",{encoding: 'utf-8'}, (err, data) => {
+    fs.readFile("./logs/printed/printer"+id+".log",{encoding: 'utf-8'}, (err, data) => {
       if(err) {
         console.log(err)
         res.status(404)
