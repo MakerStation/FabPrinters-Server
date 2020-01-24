@@ -156,7 +156,7 @@ export default class Tab extends React.Component {
 
       return (
         <div>
-          <input id="fileInput" type="file" name="file" className="btn btn-primary fileUpload"/><span>&nbsp;</span>
+          <input id="fileInput" type="file" name="file" className="btn btn-primary fileUpload" accept=".gcode,.gcod"/><span>&nbsp;</span>
           {/*<label  for="fileInput" className="btn btn-primary">Choose File</label>*/}
           <Button onClick={this.fileUpload}>Upload</Button>
           {progressBar}

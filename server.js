@@ -8,6 +8,8 @@ const socketIo = require('socket.io');
 const db = require('quick.db');
 const fs = require('fs');
 const fileUpload = require('express-fileupload');
+const SerialPort = require('serialport');
+const Readline = require('@serialport/parser-readline');
 
 //===================SERVER INIT==============================
 const port = process.env.PORT || 3001
@@ -31,27 +33,38 @@ app.use(uploadfile)
 const io = socketIo(server)
 
 //===================SERIAL PORT==============================
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
-const porta = new SerialPort('/dev/ttyUSB0', { baudRate: 250000 });
-const parser = porta.pipe(new Readline({ delimiter: '\n' }));
-// Read the port data
-porta.on("open", () => {
-  console.log('serial port open');
-});
-parser.on('data', data =>{
-  //let lettera = String.fromCharCode(data)
-  console.log(data)
-  io.emit("new command from printer", id, data);
-  //console.log('got word from arduino:', lettera)
-});
+var ports = []
+var parsers = []
+newPorta(1, '/dev/ttyUSB0', 250000)
+// const porta = new SerialPort('/dev/ttyUSB0', { baudRate: 250000 });
+// const parser = porta.pipe(new Readline({ delimiter: '\n' }));
+// // Read the port data
+// porta.on("open", () => {
+//   console.log('serial port open');
+// });
+// parser.on('data', data =>{
+//   //let lettera = String.fromCharCode(data)
+//   console.log(data)
+//   io.emit("new command from printer", id, data);
+//   //console.log('got word from arduino:', lettera)
+// });
 /*
 SerialPort.list().then(ports => {
 		console.log(ports)
 	}).catch(e => console.log(e))
   porta.write(command+"\n")
 */
-
+function newPorta(id, porta, baudrate){
+  ports[id] = new SerialPort(porta, {baudRate: baudrate}) //problema con promise non catturata se porta non esistente
+  parsers[id] = ports[id].pipe(new Readline({delimiter: '\n'}))
+  ports[id].on("open", () => {
+    console.log('serial port '+porta+' open');
+  });
+  parsers[id].on('data', data =>{
+    console.log(data)
+    io.emit("new command from printer", id, data);
+  });
+}
 //===================SOCKET===================================
 io.on("connection", socket => {
   console.log("User connected")
@@ -61,7 +74,7 @@ io.on("connection", socket => {
     fn("ok")
     let string = "3-"+Date.now()+"-"+command
     fs.appendFile("./logs/printed/printer"+id+".log", string+"\n1-"+Date.now()+"-ok\n", err => console.log(err))
-    porta.write(command+"\n")
+    ports[id].write(command+"\n")
     socket.broadcast.emit("new command from client", id, command)
     io.emit("new command from printer", id, "ok")
   })
