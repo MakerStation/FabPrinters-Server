@@ -44,6 +44,13 @@ export default class Tab extends React.Component {
           this.commandUpdate()
         }
       })
+      this.props.socket.on("new command from server", (id, command) => {
+        if(this.props.number == id){
+          // console.log(command)
+          this.commandLog.push(new Cmd(command, 4, new Date()))
+          this.commandUpdate()
+        }
+      })
       this.props.socket.on("switch print tab", id => {
         this.commandDiv = []
         this.commandLog = []

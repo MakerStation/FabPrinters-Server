@@ -3,7 +3,7 @@ import Icon from '@mdi/react'
 import { mdiPrinter3dNozzle } from '@mdi/js'
 import AutoBind from "auto-bind"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLaptop } from "@fortawesome/free-solid-svg-icons";
+import { faLaptop, faServer } from "@fortawesome/free-solid-svg-icons";
 import "./App.css"
 
 const spazio = " - "
@@ -38,6 +38,14 @@ export default class cmd {
     }else if(this.sender == 3){
       return(<div style={{color: 'gray'}} className="fontMonospace">
         <FontAwesomeIcon icon={faLaptop}/>
+        {spazio}
+        {this.timestamp}
+        {spazio}
+        {this.command}
+      </div>)
+    }else if(this.sender == 4){
+      return(<div style={{color: 'gray'}} className="fontMonospace">
+        <FontAwesomeIcon icon={faServer}/>
         {spazio}
         {this.timestamp}
         {spazio}

@@ -30,6 +30,28 @@ app.use(uploadfile)
 //===================SOCKET INIT==============================
 const io = socketIo(server)
 
+//===================SERIAL PORT==============================
+const SerialPort = require('serialport');
+const Readline = require('@serialport/parser-readline');
+const porta = new SerialPort('/dev/ttyUSB0', { baudRate: 250000 });
+const parser = porta.pipe(new Readline({ delimiter: '\n' }));
+// Read the port data
+porta.on("open", () => {
+  console.log('serial port open');
+});
+parser.on('data', data =>{
+  //let lettera = String.fromCharCode(data)
+  console.log(data)
+  io.emit("new command from printer", id, data);
+  //console.log('got word from arduino:', lettera)
+});
+/*
+SerialPort.list().then(ports => {
+		console.log(ports)
+	}).catch(e => console.log(e))
+  porta.write(command+"\n")
+*/
+
 //===================SOCKET===================================
 io.on("connection", socket => {
   console.log("User connected")
@@ -39,6 +61,7 @@ io.on("connection", socket => {
     fn("ok")
     let string = "3-"+Date.now()+"-"+command
     fs.appendFile("./logs/printed/printer"+id+".log", string+"\n1-"+Date.now()+"-ok\n", err => console.log(err))
+    porta.write(command+"\n")
     socket.broadcast.emit("new command from client", id, command)
     io.emit("new command from printer", id, "ok")
   })
