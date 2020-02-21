@@ -4,16 +4,20 @@ import {
   Button,
   FormInput,
   Row,
-  Col
+  Col,
+  Badge,
+  Slider
 } from 'shards-react'
 import './App.css';
 import Cmd from "./Cmd.js"
 import axios from "axios"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faCog, faPlayCircle, faCheckCircle, faExclamationCircle, faPauseCircle, faTimesCircle, faExclamationTriangle, faThermometerHalf, faListAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCircle, faPlayCircle, faPauseCircle, faTimesCircle, faListAlt } from "@fortawesome/free-solid-svg-icons";
+import Icon from '@mdi/react'
+import { mdiPrinter3dNozzle, mdiSquareInc } from '@mdi/js'
 
-var progressBar, connectForm = null
+var progressBar, connectForm, rightSide = null
 export default class Tab extends React.Component {
 
     constructor(props){
@@ -21,31 +25,34 @@ export default class Tab extends React.Component {
       this.state = {
         comandi: 0,
         update: 1,
-        uploadFile: null
+        uploadFile: null,
+        printSpeed: 100,
+        printFlow: 100
       }
       this.commandDiv = []
       this.commandLog = []
     }
 
     componentDidMount(){
+      this.generateRightSide()
       console.log(this.commandDiv)
       console.log(this.commandLog)
       this.props.socket.on("new command from printer", (id, command) => {
-        if(this.props.number == id){
+        if(this.props.number === id){
           // console.log(command)
           this.commandLog.push(new Cmd(command, 1, new Date()))
           this.commandUpdate()
         }
       })
       this.props.socket.on("new command from client", (id, command) => {
-        if(this.props.number == id){
+        if(this.props.number === id){
           // console.log(command)
           this.commandLog.push(new Cmd(command, 3, new Date()))
           this.commandUpdate()
         }
       })
       this.props.socket.on("new command from server", (id, command) => {
-        if(this.props.number == id){
+        if(this.props.number === id){
           // console.log(command)
           this.commandLog.push(new Cmd(command, 4, new Date()))
           this.commandUpdate()
@@ -135,18 +142,47 @@ export default class Tab extends React.Component {
 
     keyListenerCommand(e) {
       let keyCode = (e.keyCode ? e.keyCode : e.which)
-      if(keyCode == 13){
+      if(keyCode === 13){
         this.send()
       }
     }
 
     fileUpload = () => {
-      let file = this.state.uploadFile
       var data = new FormData();
       data.append("file", document.getElementById("fileInput").files[0]);
       axios.post("http://localhost:3001/uploadfile", data, {
         // receive two    parameter endpoint url ,form data
       })
+    }
+    speedOnSlide = (e) => {
+      this.setState({printSpeed: parseInt(e[0])})
+      this.updateRightSide()
+    }
+    flowOnSlide = (e) => {
+      this.setState({printFlow: parseInt(e[0])})
+      this.updateRightSide()
+    }
+
+
+    generateRightSide() {
+      let ret =<div><Col>
+        <Row><Badge outline theme="secondary"><Badge outline theme="info" className="positionBadge">X: 000.00</Badge><Badge outline theme="info" className="positionBadge">Y: 000.00</Badge><Badge outline theme="info" className="positionBadge">Z: 000.00</Badge></Badge></Row>
+
+        <Row><Badge outline theme="secondary">
+          <Badge outline theme="info" className="temperatureBadge">SELEZIONE ESTRUSORE (non disponibile al momento)</Badge><br/>
+        <Badge outline theme="info" className="temperatureBadge"><FontAwesomeIcon icon={faCircle} className="circleRed"/> <Icon path={mdiPrinter3dNozzle} size={0.68} color="#00b8d8"/> XXX°C <input type="number" placeholder="0" className="temperatureNumberInput"/></Badge><br/>
+          <Badge outline theme="info" className="temperatureBadge"><FontAwesomeIcon icon={faCircle} className="circleGreen"/> <Icon path={mdiSquareInc} size={0.68} color="#00b8d8"/> XXX°C <input type="number" placeholder="0" className="temperatureNumberInput"/></Badge><br/>
+        </Badge></Row>
+      <Row><Badge outline theme="secondary">
+          <Badge outline theme="info" className="temperatureBadge">Print speed <br/>{this.state.printSpeed}% <Slider className="printParamsSlider" theme="info" onSlide={this.speedOnSlide} pips={{ mode: "steps", stepped: true, density: 5 }} connect={[true, false]} start={this.state.printSpeed} range={{min:1, max:200}}/></Badge>
+          <Badge outline theme="info" className="temperatureBadge">Extrusion flow rate <br/>{this.state.printFlow}% <Slider className="printParamsSlider" theme="info" onSlide={this.flowOnSlide} connect={[true, false]} start={this.state.printFlow} range={{min:1, max:200}}/></Badge>
+        </Badge></Row>
+        <Row>Altri comandi (da aggiungere)</Row>
+      </Col></div>
+    rightSide = ret
+    }
+    updateRightSide(){
+      this.generateRightSide()
     }
 
     render(){
@@ -163,13 +199,15 @@ export default class Tab extends React.Component {
           <br/>
           {connectForm}
           <br/>
-          <div className="commandLog">{this.commandDiv}</div>
+
           <br/>
           <div>
           <Row>
-            <Col><FormInput placeholder="Comando" id="Comando" className="inputTab" onKeyPress={(e) => this.keyListenerCommand(e)}></FormInput></Col>
-            <Col><Button onClick={(e) => this.send(e)} className="inputBtn">Send</Button></Col>
-            <Col></Col>
+            <Col>
+              <div className="commandLog">{this.commandDiv}</div><Col><FormInput placeholder="Comando" id="Comando" className="inputTab" onKeyPress={(e) => this.keyListenerCommand(e)}></FormInput></Col>
+              <Col><Button onClick={(e) => this.send(e)} className="inputBtn">Send</Button></Col></Col>
+            <Col>{rightSide}</Col>
+
           </Row>
         </div>
         </div>

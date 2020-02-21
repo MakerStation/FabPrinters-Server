@@ -1,35 +1,23 @@
 import React from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import {Alert, Button} from 'shards-react';
 import {
+  Button,
   Navbar,
-  NavbarToggler,
   NavbarBrand,
   Nav,
   NavItem,
   NavLink,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  FormInput,
-  Collapse,
   Badge
 } from "shards-react";
 import {Row, Col} from 'react-bootstrap'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "shards-ui/dist/css/shards.min.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faCog, faPlayCircle, faCheckCircle, faExclamationCircle, faPauseCircle, faTimesCircle, faExclamationTriangle, faThermometerHalf } from "@fortawesome/free-solid-svg-icons";
+import { faCog, faPlayCircle, faCheckCircle, faExclamationCircle, faPauseCircle, faTimesCircle, faExclamationTriangle, faThermometerHalf } from "@fortawesome/free-solid-svg-icons";
 import Tab from "./Tab.js"
 import ServerRequest from "./ServerRequest.js"
-import Cmd from "./Cmd.js"
-import Icon from '@mdi/react'
-import { mdiCarBrakeAlert } from '@mdi/js'
+// import Cmd from "./Cmd.js"
 import socketIOClient from "socket.io-client";
 
 var socket = null;
@@ -38,7 +26,6 @@ var elementPrintersTabs = []
 var S_status = [];
 var Printers = null;
 var CurrentPrinter;
-var PrintersTabs = []
 
 class App extends React.Component {
   constructor(){
@@ -51,11 +38,12 @@ class App extends React.Component {
     socket = socketIOClient(this.state.endpoint)
     Printers = new ServerRequest.Printers()
     S_status = Printers.getStatus();
+    this.interval = setInterval(() => this.setState({printTime: new Date().toLocaleTimeString()}), 1000) //(funzione da chiamare, intervallo)
   }
 
   componentDidMount = () => {
       // const socket = socketIOClient(this.state.endpoint)
-      this.interval = setInterval(() => this.setState({printTime: new Date().toLocaleTimeString()}), 1000) //(funzione da chiamare, intervallo)
+
       // socket.on('change color', (col) => {
       //     document.body.style.backgroundColor = col
       // })
@@ -80,7 +68,7 @@ class App extends React.Component {
   }
 
   UpdatePrintTab() {
-    if(this.state.currentPrinter == 0) return
+    if(this.state.currentPrinter === 0) return
     CurrentPrinter = <Tab status={S_status[this.state.currentPrinter]} number={this.state.currentPrinter} progress={Math.round((((new Date().getSeconds()/60)*100) + 0.00001) * 100) / 100} socket={socket}></Tab>
   }
 
