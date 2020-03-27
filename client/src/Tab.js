@@ -66,6 +66,8 @@ export default class Tab extends React.Component {
       })
     }
 
+
+
     async readCommandsFromFile(id){
       await fetch("http://localhost:3001/commandlog?id="+id).then(response => response.json()).then(async response => {
         response.dati.forEach(l => {
@@ -133,11 +135,18 @@ export default class Tab extends React.Component {
       document.getElementById("Comando").value = ""
     }
 
-    async commandUpdate(){
+    /*async commandUpdate(){
       this.commandDiv = []
       for (var i = Math.max(this.commandLog.length-16, 0); i < this.commandLog.length; i++) {
         this.commandDiv.push(<div>{this.commandLog[i].toHtml()}</div>)
       }
+    }*/
+
+    async commandUpdate(){
+      this.commandDiv = []
+      this.commandLog.forEach((e) => {
+        this.commandDiv.push(<div>{e.toHtml()}</div>)
+      });
     }
 
     keyListenerCommand(e) {
@@ -204,8 +213,8 @@ export default class Tab extends React.Component {
           <div>
           <Row>
             <Col>
-              <div className="commandLog">{this.commandDiv}</div><Col><FormInput placeholder="Comando" id="Comando" className="inputTab" onKeyPress={(e) => this.keyListenerCommand(e)}></FormInput></Col>
-              <Col><Button onClick={(e) => this.send(e)} className="inputBtn">Send</Button></Col></Col>
+              <div className="commandLog">{this.commandDiv}</div><Col className="noPadding topPadding noFlex"><FormInput placeholder="Comando" id="Comando" className="inputTab" onKeyPress={(e) => this.keyListenerCommand(e)}></FormInput></Col>
+              <Col className="noPadding"><Button onClick={(e) => this.send(e)} className="inputBtn">Send</Button></Col></Col>
             <Col>{rightSide}</Col>
 
           </Row>

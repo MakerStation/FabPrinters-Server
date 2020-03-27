@@ -35,6 +35,9 @@
 .commandLog {
   height: 255px!important;
   font-size: 0.81rem;
+  width: 40vw;
+  height: 25vh;
+  overflow-y: scroll;
 }
 
 .fontMonospace {
@@ -133,5 +136,16 @@
   border-radius: 3px;
 }
 .printParamsSlider {
-  width: 25.6vh !important;
+  width: 11vw !important;
+}
+.noPadding{
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+.topPadding {
+  padding-top: 5px;
+}
+.noFlex{
+  flex-grow: 0 !important; /*non va*/
+  flex: 0 !important;
 }
