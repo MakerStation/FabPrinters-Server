@@ -5,12 +5,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const http = require('http');
 const socketIo = require('socket.io');
-const db = require('quick.db');
 const fs = require('fs');
 const fileUpload = require('express-fileupload');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const LineByLineReader = require('line-by-line')
 const Events = require('events')
 
 //===================SERVER INIT==============================
@@ -71,9 +69,6 @@ function newPorta(id, porta, baudrate){
 io.on("connection", socket => {
   console.log("User connected")
 
-  var k = new GcodeAnalyzer("./test/seal.gcode")
-  k.events.on('line', (line) => console.log(line))
-
   socket.on("new command", (id, command, fn) => {
     console.log(id+": "+command)
     fn("ok")
@@ -82,7 +77,6 @@ io.on("connection", socket => {
     ports[id].write(command+"\n")
     socket.broadcast.emit("new command from client", id, command)
     io.emit("new command from printer", id, "ok")
-    k.readLine()
   })
 
   socket.on("get status", () => {
@@ -130,63 +124,5 @@ server.listen(port, () => {
 })
 
 //===================DATABASE=================================
-var printers = new db.table("printers")
 
-function getPrinter(id) {
-  return printers.get(id)
-}
-function setPrinterStatus(id, newStatus) {
-  printers.set(id+".status", newStatus)
-}
-function newPrinter(name, port, baudrate){
-  printers.add("lastId", 1)
-  printers.set(lastId, {name: name, port: port, baudrate: baudrate})
-}
 //==================GCODE====================================
-class GcodeAnalyzer{
-    constructor(filePath) {
-      // console.log(filePath)
-      this.lr = new LineByLineReader(filePath)
-      this.em = new Events.EventEmitter()
-      this.skipComments = false;
-
-      this.lr.on('line', (line) => {
-        this.lr.pause()
-        this.em.emit('line', line)
-        switch (line.charAt(0)) {
-          case 'G':
-            this.em.emit(line.substring(0, line.indexOf(" ")-1), line.substring(line.indexOf(" ")))
-            break;
-          case 'M':
-            this.em.emit(line.substring(0, line.indexOf(" ")-1), line.substring(line.indexOf(" ")))
-            break;
-          case 'T':
-            this.em.emit(line.substring(0, line.indexOf(" ")-1), line.substring(line.indexOf(" ")))
-            break;
-          default:
-            this.em.emit("comment", line)
-            if(this.skipComments) this.lr.resume()
-        }
-      })
-      //   this.lr.on('line', (line) => {
-      //     this.lr.pause()
-      //     console.log(line)
-      //     setTimeout(() => this.lr.resume(), 500)
-      //   })
-      //   this.lr.on('error', (error) => {
-      //     console.err(error)
-      //   })
-      //   this.lr.on('end', () => {
-      //     console.log("End of file "+this.filePath)
-      //   })
-      }
-    readLine(){
-      this.lr.resume()
-    }
-    skipComments(bool){
-      this.skipComments = bool;
-    }
-    get events(){
-      return this.em;
-    }
-}
