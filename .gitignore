@@ -4,3 +4,4 @@ package-lock.json
 /client/package-lock.json
 /client/yarn.lock
 *.log
+/gcode/*.gcode
