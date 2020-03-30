@@ -125,4 +125,7 @@ server.listen(port, () => {
 
 //===================DATABASE=================================
 
-//==================GCODE====================================
+//==================GCODE=====================================
+
+//==================FILE PARSING==============================
+//https://stackoverflow.com/questions/16010915/parsing-huge-logfiles-in-node-js-read-in-line-by-line
