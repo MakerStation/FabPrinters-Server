@@ -11,13 +11,12 @@ ReactDOM.render(<App />, document.getElementById('root'));
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
 
-
+var loop = setInterval(loader, 2000)
 function loader() {
-  var Strings = [
+  var phrases = [
     "Caricamento",
     "Loading"
   ];
-  if(!document.getElementById('Loading-text').innerHtml) return;
-  document.getElementById('Loading-text').innerHtml = Strings[Math.floor(Math.random*Strings.length)];
-  setTimeout(loader, 2000);
+  if(!document.getElementById('Loading-text')) return;
+  document.getElementById('Loading-text').innerHtml = phrases[Math.floor(Math.random()*phrases.size)];
 }
