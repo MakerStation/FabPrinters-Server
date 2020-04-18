@@ -33,7 +33,8 @@ class App extends React.Component {
     this.state = {
       endpoint: "localhost:3001",
       currentPrinter: 0,
-      printTime: new Date().toLocaleTimeString()  //da cambiare con tempo di stampa
+      printTime: new Date().toLocaleTimeString(),  //da cambiare con tempo di stampa
+      settings: false //true = impostazioni aperte
     }
     socket = socketIOClient(this.state.endpoint)
     Printers = new ServerRequest.Printers()
@@ -112,7 +113,10 @@ class App extends React.Component {
       }
     }
 
-
+  settings = () => {
+    if(this.state.settings) this.setState({settings: false})
+    else this.setState({settings: true})
+  }
 
 
   render() {
@@ -122,22 +126,20 @@ class App extends React.Component {
     socket.on('change color', (col) => {
      document.body.style.backgroundColor = col
    })
-
-
+   let mainDiv;
+   if(this.state.settings) mainDiv = <div> Impostazioni </div>
+   else mainDiv = <div><Nav tabs>{elementPrintersTabs}</Nav>{CurrentPrinter}</div>
       return (
         <div className="container-fluid">
           <Navbar type="dark" expand="true" theme="primary">
             <NavbarBrand href="/">Home</NavbarBrand>
             <Nav navbar>
               <NavItem>
-                <NavLink onClick={console.log}><FontAwesomeIcon icon={faCog}/></NavLink>
+                <NavLink onClick={this.settings}><FontAwesomeIcon icon={faCog}/></NavLink>
               </NavItem>
             </Nav>
           </Navbar>
-          <Nav tabs>
-            {elementPrintersTabs}
-          </Nav>
-          {CurrentPrinter}
+          {mainDiv}
         </div>
       )
   }
