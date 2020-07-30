@@ -33,7 +33,7 @@ app.use(uploadfile)
 const io = socketIo(server)
 
 //===================SERIAL PORT==============================
-var ports = []
+/*var ports = []
 var parsers = []
 newPorta(1, '/dev/ttyUSB0', 250000)
 // const porta = new SerialPort('/dev/ttyUSB0', { baudRate: 250000 });
@@ -53,7 +53,7 @@ SerialPort.list().then(ports => {
 		console.log(ports)
 	}).catch(e => console.log(e))
   porta.write(command+"\n")
-*/
+*//*
 function newPorta(id, porta, baudrate){
   ports[id] = new SerialPort(porta, {baudRate: baudrate}) //problema con promise non catturata se porta non esistente
   parsers[id] = ports[id].pipe(new Readline({delimiter: '\n'}))
@@ -64,7 +64,7 @@ function newPorta(id, porta, baudrate){
     console.log(data)
     io.emit("new command from printer", id, data);
   });
-}
+}*/
 //===================SOCKET===================================
 io.on("connection", socket => {
   console.log("User connected")
