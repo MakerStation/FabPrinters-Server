@@ -7,13 +7,22 @@ const http = require('http');
 const socketIo = require('socket.io');
 const fs = require('fs');
 const fileUpload = require('express-fileupload');
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const expressRateLimit = require('express-rate-limit');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const Events = require('events')
+const Events = require('events');
 
 //===================SERVER INIT==============================
+const limiter = expressRateLimit({
+  windowMs: 60*1000, //60 sec
+  max: 100 //requests
+})
 const port = process.env.PORT || 3001
 const app = express()
+app.use(helmet()) //security
+app.use(limiter)
 app.use(logger('dev')) //for log
 app.use(cors())
 app.use(fileUpload())
@@ -22,16 +31,15 @@ app.use(bodyParser.json())
 const server = http.createServer(app)
 
 //===================ROUTES===================================
-const index = require("./routes/index")
-app.use(index)
-const getcommandlog = require("./routes/getCommandLog")
-app.use(getcommandlog)
-const uploadfile = require("./routes/uploadFile")
-app.use(uploadfile)
-
+const printer = require("./src/printer")
+app.use(printer)
+const user = require("./src/user")
+app.use(user)
 //===================SOCKET INIT==============================
 const io = socketIo(server)
-
+app.get("/", (req, res) => {
+  res.send({ response: "Hello World" }).status(200);
+});
 //===================SERIAL PORT==============================
 /*var ports = []
 var parsers = []
@@ -124,7 +132,11 @@ server.listen(port, () => {
 })
 
 //===================DATABASE=================================
-
+  const dburl = 'mongodb://127.0.0.1:27017/fab-printers'
+  mongoose.connect(dburl, {useNewUrlParser: true})
+  const db = mongoose.connection
+  db.once('open', () => {console.log("Database Connected")})
+  db.on('error', err => {console.log("Database Error: "+err)})
 //==================GCODE=====================================
 
 //==================FILE PARSING==============================
