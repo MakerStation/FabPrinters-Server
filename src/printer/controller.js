@@ -1,4 +1,5 @@
 const Printer = require('../models/printer.model')
+const PrinterLogModel = require('../models/printerLog.model')
 
 const getAllPrinters = function (req, res, next) {
   Printer
@@ -22,8 +23,8 @@ const newPrinter = function (req, res, next) {
     baudRate: baudRate
   })
   newP.save((err, doc) => {
-    if(err) return res.send(err)
-    else return res.send(doc)
+    if(err) return res.status(500).send(err)
+    else return res.status(200).send(doc)
   })
 }
 
@@ -41,8 +42,21 @@ const findPrinter = function (req, res, next) {
   .catch(err => res.status(500).send(err))
 }
 
+const logCommand = function (req, res, next) {
+  let PrinterLog = PrinterLogModel(req.body.id)
+  const newCommand = new PrinterLog({
+    sentByPrinter: true,
+    command: req.body.command,
+    date: req.body.date ? req.body.date : Date.now()
+  })
+  newCommand.save((err, doc) => {
+    if(err) res.status(500).send(err)
+    else res.status(200).send(doc)
+  })
+}
 
 module.exports = {
   newPrinter,
-  findPrinter
+  findPrinter,
+  logCommand
 }
