@@ -55,8 +55,20 @@ const logCommand = function (req, res, next) {
   })
 }
 
+const getAllCommands = function (req, res, next) {
+  if(!req.body.id) res.status(400).send("Unvalid request")
+
+  PrinterLogModel(req.body.id).find().exec()
+  .then(results => {
+    if(!results) res.status(404).send("Log not found")
+    else res.status(200).send(results)
+  })
+  .catch(error => res.status(500).send(error))
+}
+
 module.exports = {
   newPrinter,
   findPrinter,
-  logCommand
+  logCommand,
+  getAllCommands
 }
