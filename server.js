@@ -21,10 +21,10 @@ const limiter = expressRateLimit({
 })
 const port = process.env.PORT || 3001
 const app = express()
+app.use(cors())
 app.use(helmet()) //security
 app.use(limiter)
 app.use(logger('dev')) //for log
-app.use(cors())
 app.use(fileUpload())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
