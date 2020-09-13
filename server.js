@@ -133,7 +133,7 @@ server.listen(port, () => {
 
 //===================DATABASE=================================
   const dburl = 'mongodb://127.0.0.1:27017/fab-printers'
-  mongoose.connect(dburl, {useNewUrlParser: true})
+  mongoose.connect(dburl, {useNewUrlParser: true, useUnifiedTopology: true})
   const db = mongoose.connection
   db.once('open', () => {console.log("Database Connected")})
   db.on('error', err => {console.log("Database Error: "+err)})
